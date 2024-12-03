@@ -7,8 +7,27 @@ $input = get_input(dirname(__FILE__) . '/2.txt');
 $reports = array_map(fn($item) => explode(" ", $item), $input);
 
 $safeReports = 0;
+$dampenerSafeReports = 0;
 foreach ($reports as $report) {
-    $safeReports += isReportSafe($report) ? 1 : 0;
+    if (isReportSafe($report)) {
+        $safeReports++;
+        $dampenerSafeReports++;
+    } else {
+        if (isReportSafeAfterApplyingDampenerModule($report)) {
+            $dampenerSafeReports++;
+        }
+    }
+}
+
+function isReportSafeAfterApplyingDampenerModule(array $report): bool
+{
+    for ($i = 0; $i < count($report); $i++) {
+        $reportWithoutBadLevel = array_merge(array_slice($report, 0, $i), array_slice($report, $i + 1));
+        if (isReportSafe($reportWithoutBadLevel)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function isReportSafe(array $report): bool
@@ -41,3 +60,4 @@ function isReportSafe(array $report): bool
 }
 
 echo $safeReports . "\n";
+echo $dampenerSafeReports . "\n";
