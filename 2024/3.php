@@ -17,16 +17,8 @@ $part2 = 0;
 $enabled = true;
 $pos = 0;
 while ($pos < strlen($instruction)) {
-    $doPos = false;
-    $tempPos = strpos($instruction, 'do()', $pos);
-    if ($tempPos !== false) {
-        if ($tempPos === 0 || $instruction[$tempPos - 1] !== 'n') {
-            $doPos = $tempPos;
-        }
-    }
-    
+    $doPos = strpos($instruction, 'do()', $pos);
     $dontPos = strpos($instruction, 'don\'t()', $pos);
-    
     if ($doPos !== false && $dontPos !== false) {
         $nextPos = min($doPos, $dontPos);
         $isDoInstruction = ($nextPos === $doPos);
