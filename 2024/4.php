@@ -18,13 +18,16 @@ $rows = get_input(dirname(__FILE__) . '/4.txt');
 // ];
 
 $total = 0;
+$totalMAS = 0;
 foreach ($rows as $y => $row) {
     foreach (str_split($row) as $x => $char) {
         $total += isXMAS($x, $y, $rows);
+        $totalMAS += isMAS($x, $y, $rows) ? 1 : 0;
     }
 }
 
 echo $total . "\n";
+echo $totalMAS . "\n";
 
 function isXMAS($x, $y, $rows): int {
     $directions = [
@@ -39,7 +42,7 @@ function isXMAS($x, $y, $rows): int {
     ];
 
     $count = 0;
-    foreach ($directions as $direction => [$dy, $dx]) {
+    foreach ($directions as [$dy, $dx]) {
         if (!isOutsideOfMatrix($y, $x, $dy, $dx) 
             && $rows[$y][$x] === 'X' 
             && ($rows[$y + $dy][$x + $dx] ?? '') === 'M' 
@@ -52,6 +55,43 @@ function isXMAS($x, $y, $rows): int {
     return $count;
 }
 
+function isMAS($y, $x, $rows): bool {
+    if ($rows[$y][$x] !== 'A') {
+        return false;
+    }
+
+    $directions = [
+        [1, -1],
+        [-1, 1],
+        [1, 1],
+        [-1, -1]
+    ];
+
+    foreach ($directions as [$dy, $dx]) {
+        if (isOutsideOfMatrix2($y, $x, $dy, $dx)) {
+            return false;
+        }
+    }
+
+    $bottomLeft = $rows[$y + 1][$x - 1] ?? "";
+    $topRight = $rows[$y - 1][$x + 1] ?? "";
+    $bottomRight = $rows[$y + 1][$x + 1] ?? "";
+    $topLeft = $rows[$y - 1][$x - 1] ?? "";
+    
+    if (($bottomLeft === 'M' && $topRight === 'S'
+        || $bottomLeft === 'S' && $topRight === 'M')
+        && ($bottomRight === 'M' && $topLeft === 'S'
+        || $bottomRight === 'S' && $topLeft === 'M')) {
+        return true;
+    }
+
+    return false;
+}
+
 function isOutsideOfMatrix($y, $x, $dy, $dx): bool {
     return $y + $dy < 0 || $x + $dx < 0 || $y + 2*$dy < 0 || $x + 2*$dx < 0 || $y + 3*$dy < 0 || $x + 3*$dx < 0;
+}
+
+function isOutsideOfMatrix2($y, $x, $dy, $dx): bool {
+    return $y + $dy < 0 || $x + $dx < 0;
 }
